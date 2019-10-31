@@ -6,7 +6,7 @@ module.exports = {
 	aliases: ['commands'],
 	usage: '[command name]',
 	cooldown: 5,
-	execute(message, args) {
+	execute(logger, message, args) {
 		const data = []
 		const { commands } = message.client
 
@@ -23,7 +23,7 @@ module.exports = {
 					message.reply("I've sent you a DM with all my commands!")
 				})
 				.catch(e => {
-					console.error(`Could not send help DM to ${message.author.tag}.\n`, e)
+					logger.error(`Could not send help DM to ${message.author.tag}.\n`, e)
 					message.reply("It seems like I can't DM you!")
 				})
 		}
@@ -43,6 +43,6 @@ module.exports = {
 
 		data.push(`**Cooldown:** ${command.cooldown || 3} second(s)`)
 
-		message.channel.send(data, { split: true })
+		return message.channel.send(data, { split: true })
 	}
 }

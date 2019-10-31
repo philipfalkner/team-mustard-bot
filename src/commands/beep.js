@@ -1,7 +1,7 @@
 module.exports = {
   name: 'beep',
   description: 'Beep!',
-  execute(message) {
-    message.reply('Boop.')
+  execute(logger, message) {
+    return message.reply('Boop.')
   }
 }

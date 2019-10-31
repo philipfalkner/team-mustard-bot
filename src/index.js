@@ -105,7 +105,7 @@ client.on('message', async (message) => {
 
   try {
     logger.verbose(`Executing command ${command.name} with args ${args}`)
-    await command.execute(message, args)
+    await command.execute(logger, message, args)
   } catch (e) {
     logger.error(e)
     message.reply('There was an error trying to execute that command!')
