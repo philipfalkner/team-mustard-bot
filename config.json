@@ -1,0 +1,5 @@
+{
+  "prefix": "!",
+  "defaultCooldown": 3,
+  "mustardApiBaseUri": "http://team-mustard.azurewebsites.net/api"
+}
