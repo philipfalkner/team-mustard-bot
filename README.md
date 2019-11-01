@@ -10,6 +10,10 @@ Create a `secrets.json` file in the root with your bot token, like this:
 }
 ```
 
+## Set up
+
+Run `npm install`
+
 ## Running the bot
 
 Run `npm start`
