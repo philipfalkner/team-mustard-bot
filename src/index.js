@@ -1,9 +1,8 @@
 const { Client, Collection } = require('discord.js')
-const { readdirSync } = require('fs')
+const { readdirSync, readFile } = require('fs')
 const { join } = require('path')
 const { createLogger, transports, format } = require('winston')
 const { prefix, defaultCooldown } = require('../config.json')
-const { token } = require('../secrets.json')
 
 // Set up logging
 const logger = createLogger({
@@ -112,4 +111,24 @@ client.on('message', async (message) => {
   }
 })
 
-client.login(process.env.TOKEN || token)
+// Login using token
+readFile(require.resolve(join('..', 'secrets.json')), (error, data) => {
+  let secrets = {}
+  
+  if (error) {
+    logger.info('No secrets.json found.')
+  } else {
+    logger.info('Reading from secrets.json.')
+    secrets = JSON.parse(data)
+  }
+  
+  let token
+  if (process.env.TOKEN) {
+    logger.info('Using token from environment variable TOKEN.')
+    token = process.env.TOKEN
+  } else {
+    logger.info('Using token from secrets.json.')
+    token = secrets.token
+  }
+  client.login(token)
+})
