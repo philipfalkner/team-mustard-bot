@@ -10,6 +10,10 @@ Create a `secrets.json` file in the same folder as `package.json` with your bot 
 }
 ```
 
+## Set up
+
+Run `npm install`
+
 ## Running the bot
 
 Run `npm start`
