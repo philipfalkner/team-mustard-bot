@@ -1,5 +1,5 @@
 const { Client, Collection } = require('discord.js')
-const { readdirSync, readFile } = require('fs')
+const { readdirSync, readFileSync } = require('fs')
 const { join } = require('path')
 const { createLogger, transports, format } = require('winston')
 const { prefix, defaultCooldown } = require('../config.json')
@@ -23,6 +23,16 @@ const logger = createLogger({
     }),
   ],
 })
+
+// Check for secrets file
+let secrets = {}
+try {
+  const secretsPath = require.resolve(join('..', 'secrets.json'))
+  var secretsFileJson = readFileSync(secretsPath, { encoding: 'utf8' })
+  secrets = JSON.parse(secretsFileJson)
+} catch (e) {
+  logger.info('Failed to read secrets.json.')
+}
 
 // Set up client
 const client = new Client()
@@ -112,23 +122,18 @@ client.on('message', async (message) => {
 })
 
 // Login using token
-readFile(require.resolve(join('..', 'secrets.json')), (error, data) => {
-  let secrets = {}
-  
-  if (error) {
-    logger.info('No secrets.json found.')
-  } else {
-    logger.info('Reading from secrets.json.')
-    secrets = JSON.parse(data)
-  }
-  
-  let token
-  if (process.env.TOKEN) {
-    logger.info('Using token from environment variable TOKEN.')
-    token = process.env.TOKEN
-  } else {
-    logger.info('Using token from secrets.json.')
-    token = secrets.token
-  }
+let token
+if (process.env.TOKEN) {
+  logger.info('Using Discord token from environment variable TOKEN.')
+  token = process.env.TOKEN
+} else if (secrets.token) {
+  logger.info('Using Discord token from secrets.json.')
+  token = secrets.token
+}
+
+if (token) {
   client.login(token)
-})
+} else {
+  logger.error('No Discord token provided.')
+  exit
+}
