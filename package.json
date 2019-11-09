@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/philipfalkner/team-mustard-bot-discord.git"
+    "url": "git+https://github.com/team-mustardd/MustardBot-discord.git"
   },
   "keywords": [],
   "author": "Philip Falkner",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/philipfalkner/team-mustard-bot-discord/issues"
+    "url": "https://github.com/team-mustardd/MustardBot-discord/issues"
   },
-  "homepage": "https://github.com/philipfalkner/team-mustard-bot-discord#readme",
+  "homepage": "https://github.com/team-mustardd/MustardBot-discord#readme",
   "dependencies": {
     "discord.js": "^11.5.1",
     "node-fetch": "^2.6.0",
