@@ -36,17 +36,17 @@ async function startMinecraft (logger, message) {
   const url = `${minecraftServerFunctionUri}?code=${process.env.MINECRAFT_SERVER_FUNCTION_CODE}`
   logger.info(`Sending request to start the Minecraft server (${url})...`)
 
-  logger.debug(`Requesting ${url}`)
+  logger.verbose(`Requesting ${url}`)
   const functionStartResponse = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
   const functionStart = functionStartResponse.json()
-  logger.debug(`Response: ${functionStart}`)
+  logger.verbose(`Response: ${functionStart}`)
 
   logger.info('Waiting for Minecraft server to start...')
   while (moment().isBefore(startupTimeLimit)) {
-    logger.debug(`Requesting ${functionStart.statusQueryGetUri}`)
+    logger.verbose(`Requesting ${functionStart.statusQueryGetUri}`)
     const functionStatusResponse = await fetch(functionStart.statusQueryGetUri, { headers: { 'Content-Type': 'application/json' } })
     const functionStatus = functionStatusResponse.json()
-    logger.debug(`Response: ${functionStatus}`)
+    logger.verbose(`Response: ${functionStatus}`)
 
     const serverData = functionStatus.customStatus
     logger.info(`Minecraft server status: ${serverData.serverStatus}`)
@@ -55,9 +55,11 @@ async function startMinecraft (logger, message) {
       case 'Running':
         message.reply(`Minecraft is ready! Connect to ${serverData.serverName}`)
         return
+
       case 'Stopping':
       case 'Stopped':
         throw new Error('Minecraft server unexpectedly stopped.')
+
       default:
         await sleep(5000)
     }
