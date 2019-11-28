@@ -39,14 +39,14 @@ async function startMinecraft (logger, message) {
   logger.verbose(`Requesting ${url}`)
   const functionStartResponse = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
   const functionStart = await functionStartResponse.json()
-  logger.verbose(`Response: ${functionStart}`)
+  logger.verbose(`Response: ${JSON.stringify(functionStart)}`)
 
   logger.info('Waiting for Minecraft server to start...')
   while (moment().isBefore(startupTimeLimit)) {
     logger.verbose(`Requesting ${functionStart.statusQueryGetUri}`)
     const functionStatusResponse = await fetch(functionStart.statusQueryGetUri, { headers: { 'Content-Type': 'application/json' } })
     const functionStatus = await functionStatusResponse.json()
-    logger.verbose(`Response: ${functionStatus}`)
+    logger.verbose(`Response: ${JSON.stringify(functionStatus)}`)
 
     const serverData = functionStatus.customStatus
     logger.info(`Minecraft server status: ${serverData.serverStatus}`)
