@@ -1,5 +1,6 @@
 {
   "prefix": "!",
   "defaultCooldown": 3,
-  "mustardApiBaseUri": "http://team-mustard.azurewebsites.net/api"
+  "mustardApiBaseUri": "http://team-mustard.azurewebsites.net/api",
+  "minecraftServerFunctionUri": "https://team-mustard-minecraft-funcs.azurewebsites.net/api/orchestrators/startMinecraft"
 }
