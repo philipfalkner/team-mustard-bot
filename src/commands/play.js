@@ -50,7 +50,8 @@ async function startMinecraft (logger, message) {
 
     switch (serverStatus) {
       case 'Running':
-        message.reply(`Minecraft is ready! Connect to ${serverStatus}`)
+        const serverName = serverData.serverName
+        message.reply(`Minecraft is ready!${serverName && ` Connect to ${serverName}`}`)
         return
 
       case 'Stopping':
