@@ -8,7 +8,7 @@ module.exports = {
   description: 'Start a Team Mustard game server.',
   async execute (logger, message, args) {
     const data = []
-    let game = args[0] || ''
+    const game = args[0] || ''
 
     switch (game.toLowerCase()) {
       case 'minecraft':
@@ -16,7 +16,7 @@ module.exports = {
           await startMinecraft(logger, message)
         } catch (e) {
           logger.error(e)
-          message.reply("Sorry, something went wrong starting Minecraft. :cry:")
+          message.reply('Sorry, something went wrong starting Minecraft. :cry:')
         }
         return
 
@@ -45,7 +45,7 @@ async function startMinecraft (logger, message) {
       },
       retries: 3,
       retryDelay: (attempt, error, response) => Math.pow(2, attempt) * 1000 // exponential backoff
-  })
+    })
   const functionStart = await functionStartResponse.json()
 
   logger.info('Waiting for Minecraft server to start...')
@@ -54,12 +54,11 @@ async function startMinecraft (logger, message) {
     const functionStatus = await functionStatusResponse.json()
 
     const serverData = functionStatus.customStatus
-    const serverStatus = serverData && serverData.serverStatus
+    const { serverName, serverStatus } = serverData || {}
     logger.info(`Minecraft server status: ${serverStatus}`)
 
     switch (serverStatus) {
       case 'Running':
-        const serverName = serverData.serverName
         message.reply(`Minecraft is ready!${serverName && ` Connect to ${serverName}`}`)
         return
 

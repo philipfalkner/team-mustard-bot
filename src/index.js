@@ -6,22 +6,22 @@ const { prefix, defaultCooldown } = require('../config.json')
 
 // Set up logging
 const logger = createLogger({
-  level: 'verbose',
+  level: 'debug',
   format: format.errors(),
   transports: [
     new transports.Console({
       format: format.combine(
         format.colorize(),
-        format.simple(),
-      ),
+        format.simple()
+      )
     }),
     new transports.File({
       level: 'info',
       filename: 'discordbot.log',
       format: format.json(),
-      handleExceptions: true,
-    }),
-  ],
+      handleExceptions: true
+    })
+  ]
 })
 
 // Check for secrets file
@@ -65,8 +65,8 @@ client.on('message', async (message) => {
   const commandName = args.shift().toLowerCase()
 
   // Search for a matching command
-  const command = client.commands.get(commandName)
-    || client.commands.find((c) => c.aliases && c.aliases.includes(commandName))
+  const command = client.commands.get(commandName) ||
+    client.commands.find((c) => c.aliases && c.aliases.includes(commandName))
   if (!command) {
     return
   }
@@ -135,5 +135,4 @@ if (token) {
   client.login(token)
 } else {
   logger.error('No Discord token provided.')
-  exit
 }
