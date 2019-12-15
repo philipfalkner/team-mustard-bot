@@ -1,4 +1,4 @@
-const fetch = require('node-fetch')
+const fetch = require('fetch-retry')
 const { mustardApiBaseUri } = require('../../config.json')
 
 function colourStringToInt (colourString) {
@@ -9,7 +9,16 @@ module.exports = {
   name: 'mustard-day',
   description: 'Choose which day is Mustard Day!',
   async execute (logger, message) {
-    const { label, colour, info, img } = await fetch(`${mustardApiBaseUri}/days/actions/pick`, { method: 'POST' }).then(response => response.json())
+    logger.info('Fetching Mustard Day...')
+    const { label, colour, info, img } = await fetch(
+      `${mustardApiBaseUri}/days/actions/pick`,
+      {
+        method: 'POST',
+        retries: 3,
+        retryDelay: (attempt, error, response) => Math.pow(2, attempt) * 1000 // exponential backoff
+      }
+    ).then(response => response.json())
+    logger.info(`Mustard Day is ${label}.`)
 
     const embed = {
       color: colourStringToInt(colour),

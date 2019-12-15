@@ -1,4 +1,4 @@
-const fetch = require('node-fetch')
+const fetch = require('fetch-retry')
 const moment = require('moment')
 const { minecraftServerFunctionUri } = require('../../config.json')
 
@@ -36,7 +36,16 @@ async function startMinecraft (logger, message) {
   const url = `${minecraftServerFunctionUri}?code=${process.env.MINECRAFT_SERVER_FUNCTION_CODE}`
   logger.info(`Sending request to start the Minecraft server (${url})...`)
 
-  const functionStartResponse = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+  const functionStartResponse = await fetch(
+    url,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      retries: 3,
+      retryDelay: (attempt, error, response) => Math.pow(2, attempt) * 1000 // exponential backoff
+  })
   const functionStart = await functionStartResponse.json()
 
   logger.info('Waiting for Minecraft server to start...')

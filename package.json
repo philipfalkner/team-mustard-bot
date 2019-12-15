@@ -20,8 +20,8 @@
   "homepage": "https://github.com/team-mustardd/MustardBot-discord#readme",
   "dependencies": {
     "discord.js": "^11.5.1",
+    "fetch-retry": "^2.2.3",
     "moment": "^2.24.0",
-    "node-fetch": "^2.6.0",
     "winston": "^3.2.1"
   },
   "devDependencies": {
