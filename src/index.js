@@ -6,25 +6,25 @@ const { prefix, defaultCooldown } = require('../config.json')
 
 // Set up logging
 const logger = createLogger({
-  level: 'verbose',
+  level: 'debug',
   format: format.errors(),
   transports: [
     new transports.Console({
       format: format.combine(
         format.colorize(),
-        format.simple(),
-      ),
+        format.simple()
+      )
     }),
     new transports.File({
       level: 'info',
       filename: 'discordbot.log',
       format: format.json(),
-      handleExceptions: true,
-    }),
-  ],
+      handleExceptions: true
+    })
+  ]
 })
 
-// Check for secrets file
+// Load secrets from file, then overlay with environment variables
 let secrets = {}
 try {
   const secretsPath = require.resolve(join('..', 'secrets.json'))
@@ -32,6 +32,11 @@ try {
   secrets = JSON.parse(secretsFileJson)
 } catch (e) {
   logger.info('Failed to read secrets.json.')
+}
+secrets = {
+  ...secrets,
+  ...(process.env.TOKEN && { token: process.env.TOKEN }),
+  ...(process.env.MINECRAFT_SERVER_FUNCTION_CODE && { minecraftServerFuncsCode: process.env.MINECRAFT_SERVER_FUNCTION_CODE })
 }
 
 // Set up client
@@ -65,8 +70,8 @@ client.on('message', async (message) => {
   const commandName = args.shift().toLowerCase()
 
   // Search for a matching command
-  const command = client.commands.get(commandName)
-    || client.commands.find((c) => c.aliases && c.aliases.includes(commandName))
+  const command = client.commands.get(commandName) ||
+    client.commands.find((c) => c.aliases && c.aliases.includes(commandName))
   if (!command) {
     return
   }
@@ -114,7 +119,7 @@ client.on('message', async (message) => {
 
   try {
     logger.verbose(`Executing command ${command.name} with args ${args}`)
-    await command.execute(logger, message, args)
+    await command.execute(logger, message, args, secrets)
   } catch (e) {
     logger.error(e)
     message.reply('There was an error trying to execute that command!')
@@ -122,18 +127,8 @@ client.on('message', async (message) => {
 })
 
 // Login using token
-let token
-if (process.env.TOKEN) {
-  logger.info('Using Discord token from environment variable TOKEN.')
-  token = process.env.TOKEN
-} else if (secrets.token) {
-  logger.info('Using Discord token from secrets.json.')
-  token = secrets.token
-}
-
-if (token) {
-  client.login(token)
+if (secrets.token) {
+  client.login(secrets.token)
 } else {
   logger.error('No Discord token provided.')
-  exit
 }

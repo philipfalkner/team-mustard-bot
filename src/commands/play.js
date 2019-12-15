@@ -1,4 +1,4 @@
-const fetch = require('node-fetch')
+const fetch = require('fetch-retry')
 const moment = require('moment')
 const { minecraftServerFunctionUri } = require('../../config.json')
 
@@ -6,17 +6,17 @@ module.exports = {
   name: 'play',
   usage: '[game name]',
   description: 'Start a Team Mustard game server.',
-  async execute (logger, message, args) {
+  async execute (logger, message, args, secrets) {
     const data = []
-    let game = args[0] || ''
+    const game = args[0] || ''
 
     switch (game.toLowerCase()) {
       case 'minecraft':
         try {
-          await startMinecraft(logger, message)
+          await startMinecraft(logger, message, secrets.minecraftServerFuncsCode)
         } catch (e) {
           logger.error(e)
-          message.reply("Sorry, something went wrong starting Minecraft. :cry:")
+          message.reply('Sorry, something went wrong starting Minecraft. :cry:')
         }
         return
 
@@ -28,15 +28,24 @@ module.exports = {
   }
 }
 
-async function startMinecraft (logger, message) {
+async function startMinecraft (logger, message, minecraftServerFuncsCode) {
   const startupTimeLimit = moment().add(5, 'minute')
 
   message.reply("I'm getting Minecraft ready for you!")
 
-  const url = `${minecraftServerFunctionUri}?code=${process.env.MINECRAFT_SERVER_FUNCTION_CODE}`
+  const url = `${minecraftServerFunctionUri}?code=${minecraftServerFuncsCode}`
   logger.info(`Sending request to start the Minecraft server (${url})...`)
 
-  const functionStartResponse = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+  const functionStartResponse = await fetch(
+    url,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      retries: 3,
+      retryDelay: (attempt, error, response) => Math.pow(2, attempt) * 1000 // exponential backoff
+    })
   const functionStart = await functionStartResponse.json()
 
   logger.info('Waiting for Minecraft server to start...')
@@ -45,12 +54,11 @@ async function startMinecraft (logger, message) {
     const functionStatus = await functionStatusResponse.json()
 
     const serverData = functionStatus.customStatus
-    const serverStatus = serverData && serverData.serverStatus
+    const { serverName, serverStatus } = serverData || {}
     logger.info(`Minecraft server status: ${serverStatus}`)
 
     switch (serverStatus) {
       case 'Running':
-        const serverName = serverData.serverName
         message.reply(`Minecraft is ready!${serverName && ` Connect to ${serverName}`}`)
         return
 
