@@ -11,7 +11,7 @@ module.exports = {
   async execute (logger, message) {
     logger.info('Fetching Mustard Day...')
     const { label, colour, info, img } = await fetch(
-      `${mustardApiBaseUri}/days/actions/pick`,
+      `${mustardApiBaseUri}/mustardDay/actions/pick`,
       {
         method: 'POST',
         retries: 3,
