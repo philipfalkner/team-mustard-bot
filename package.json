@@ -21,7 +21,7 @@
   "dependencies": {
     "discord.js": "^11.5.1",
     "fetch-retry": "^2.2.3",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "winston": "^3.2.1"
   },
   "devDependencies": {
